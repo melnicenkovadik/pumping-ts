@@ -6,24 +6,22 @@ import {
   ListItemText,
   Divider,
   Container,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell, TableBody, Paper,
-} from '@material-ui/core';
+  IconButton,
 
+} from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
-import List from '@mui/material/List';
-import {styled} from '@mui/material/styles';
 
 import {KeyboardArrowDown} from '@mui/icons-material';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
 import {useState} from "react";
-import IconButton from "@material-ui/core/IconButton";
-import RemoveIcon from "@material-ui/icons/Remove";
-import AddIcon from "@material-ui/icons/Add";
+
+import {useActions} from "../app/hooks/useActions";
+import {useHistory} from "react-router-dom";
 
 export const CreateProgram: React.FC = () => {
+  const {fetchProgram} = useActions()
+  const history = useHistory()
   const [newExercises, setNewExercises] = React.useState('');
   const [myProgram, setMyProgram] = useState([]);
   const [field, setField] = useState([""]);
@@ -63,27 +61,10 @@ export const CreateProgram: React.FC = () => {
   };
   const createProgram = () => {
     const newVal = [...myProgram]
-    // @ts-ignore
-
+    fetchProgram(newVal)
+    history.push("/my-program")
     console.log(newVal);
   }
-
-  const FireNav = styled(List)({
-    '& .MuiListItemButton-root': {
-      paddingLeft: 24,
-      paddingRight: 24,
-    },
-    '& .MuiListItemIcon-root': {
-      minWidth: 0,
-      marginRight: 16,
-    },
-    '& .MuiSvgIcon-root': {
-      fontSize: 25,
-    },
-    '& .MuiTextField-root': {
-      fontSize: 25,
-    },
-  });
 
   const handleCreateExercise = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -129,67 +110,66 @@ export const CreateProgram: React.FC = () => {
   };
   return (
       <Container>
+        <Button variant="outlined" disabled={myProgram.length < 1} onClick={createProgram}>Сохранить программу
+          тренеровок</Button>
         <Box>
-          <FireNav>
-            <Box>
-              {exercises.map((exercise, index) => (
-                  <>
-                    <ListItemButton
-                        key={exercise.title + index}
-                        alignItems="flex-start"
-                        onClick={() => expandExerciseHandler(exercise.title)}
-                        sx={{
-                          px: 3,
-                          pt: 2.5,
-                          pb: exercise.open ? 0 : 2.5,
-                          width: '100%',
-                          '&:hover, &:focus': {'& svg': {opacity: exercise.open ? 1 : 0}},
-                        }}
+          {exercises.map((exercise, index) => (
+              <>
+                <ListItemButton
+                    key={exercise.title + index}
+                    alignItems="flex-start"
+                    onClick={() => expandExerciseHandler(exercise.title)}
+                    sx={{
+                      fontSize: 20,
+                      px: 3,
+                      pt: 2.5,
+                      pb: exercise.open ? 0 : 2.5,
+                      width: '100%',
+                      '&:hover, &:focus': {'& svg': {opacity: exercise.open ? 1 : 0}},
+                    }}
+                >
+                  <ListItemText
+                      primary={exercise.title}
+                      secondary={!exercise.open && exercise.listOfExercises.join(' , ')}
+                      secondaryTypographyProps={{
+                        noWrap: true,
+                        color: exercise.open ? 'inherit' : 'primary',
+                      }}
+                  />
+                  <KeyboardArrowDown
+                      sx={{
+                        mr: -1,
+                        opacity: 0,
+                        transform: exercise.open ? 'rotate(-180deg)' : 'rotate(0)',
+                        transition: '0.2s',
+                      }}
+                  />
+                </ListItemButton>
+                <Divider/>
+                {exercise.open
+                && exercise.listOfExercises.map((item, index) => (
+                    <div
+                        key={item.trim() + index}
                     >
-                      <ListItemText
-                          primary={exercise.title}
-                          secondary={!exercise.open && exercise.listOfExercises.join(' , ')}
-                          secondaryTypographyProps={{
-                            noWrap: true,
-                            color: exercise.open ? 'inherit' : 'primary',
-                          }}
-                          style={{fontSize: 28, fontWeight: 700, color: 'red'}}
-                      />
-                      <KeyboardArrowDown
-                          sx={{
-                            mr: -1,
-                            opacity: 0,
-                            transform: exercise.open ? 'rotate(-180deg)' : 'rotate(0)',
-                            transition: '0.2s',
-                          }}
-                      />
-                    </ListItemButton>
-                    <Divider/>
-                    {exercise.open
-                    && exercise.listOfExercises.map((item, index) => (
-                        <div
-                            key={item.trim() + index}
-                        >
-                          <ListItemButton
-                              onClick={() => setExerciseToProgram(exercise.title, item)}
-                              sx={{py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)'}}
-                          >
-                            <ListItemText
-                                primary={item}
-                                style={{fontSize: 10, opacity: '0.7'}}
-                            />
-                          </ListItemButton>
-                        </div>
-                    ))}
-                    <Divider/>
-                  </>
-              ))}
-            </Box>
-          </FireNav>
+                      <ListItemButton
+                          onClick={() => setExerciseToProgram(exercise.title, item)}
+                          sx={{py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)'}}
+                      >
+                        <ListItemText
+                            primary={item}
+                            style={{fontSize: 10, opacity: '0.7'}}
+                        />
+                      </ListItemButton>
+                    </div>
+                ))}
+                <Divider/>
+              </>
+          ))}
         </Box>
         <Box
             component='form'
             onSubmit={handleCreateExercise}
+            style={{marginTop: 40}}
         >
           <TextField
               style={{width: '100%', marginBottom: 10}}
@@ -223,36 +203,13 @@ export const CreateProgram: React.FC = () => {
                   disabled={newExercises.length < 3 || field[0].length < 2}>Добавить
           </Button>
         </Box>
-        <Button onClick={createProgram}>CreateProgram</Button>
-        {myProgram.map(({title, listOfExercises}, index) => {
-          return (
-              <div>{title}:{[...listOfExercises]}</div>
-          )
-        })}
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Упражнение</TableCell>
-                <TableCell align="right">Группа мышц</TableCell>
-                <TableCell align="right">Ккал/мин&nbsp;(g)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {myProgram.map((row,index) => (
-                  <TableRow
-                      key={row["listOfExercises"]}
-                  >
-                    <TableCell component="th" scope="row">
-                      {row["listOfExercises"]}
-                    </TableCell>
-                    <TableCell align="right">{row["title"]}</TableCell>
-                    <TableCell align="right">{index * 2}</TableCell>
-                  </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Box>
+          {myProgram.map(({listOfExercises}, index) => {
+            return (
+                <div key={index}>{[...listOfExercises]}</div>
+            )
+          })}
+        </Box>
       </Container>
   );
 };
