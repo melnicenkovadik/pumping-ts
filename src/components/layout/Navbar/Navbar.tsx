@@ -12,28 +12,35 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import {useTypedSelector} from "../../../app/hooks";
 
 const pages = [
   {
     page: 'Main',
     path: '/',
+    isPrivate:false
   },
   {
     page: 'Create program',
     path: '/create-program',
+    isPrivate:true,
   },
   {
     page: 'My program',
     path: '/my-program',
+    isPrivate:true,
   },
   {
     page: 'About',
     path: '/about',
+    isPrivate:false
   },
 ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const Navbar: React.FC = () => {
+  const {isAuth} = useTypedSelector(state => state.user)
+
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -97,8 +104,8 @@ const Navbar: React.FC = () => {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                {pages.map(({ page, path }) => (
-                  <NavLink key={page} to={path}>
+                {pages.map(({ page, path,isPrivate }) => (
+                    isPrivate && isAuth && <NavLink key={page} to={path}>
                     <MenuItem key={page} onClick={handleCloseNavMenu}>
                       <Typography textAlign="center">{page}</Typography>
                     </MenuItem>
@@ -115,19 +122,31 @@ const Navbar: React.FC = () => {
               LOGO
             </Typography>
             <Box sx={{ flexGrow: 1, gap: 2, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map(({ page, path }) => (
-                <NavLink
-                  to={path}
-                  key={page}
-                >
-                  <Button
-                    variant="contained"
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: 'white', display: 'block' }}
+              {pages.map(({ page, path,isPrivate }) => (
+                  isAuth ? <NavLink
+                      to={path}
+                      key={page}
                   >
-                    {page}
-                  </Button>
-                </NavLink>
+                    <Button
+                        variant="contained"
+                        onClick={handleCloseNavMenu}
+                        sx={{ my: 2, color: 'white', display: 'block' }}
+                    >
+                      {page}
+                    </Button>
+                  </NavLink>
+                      : !isPrivate && <NavLink
+                      to={path}
+                      key={page}
+                  >
+                    <Button
+                        variant="contained"
+                        onClick={handleCloseNavMenu}
+                        sx={{ my: 2, color: 'white', display: 'block' }}
+                    >
+                      {page}
+                    </Button>
+                  </NavLink>
               ))}
             </Box>
 

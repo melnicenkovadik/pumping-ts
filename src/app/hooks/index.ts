@@ -1,2 +1,4 @@
-// @ts-ignore
-console.log("one");
+import {useTypedSelector} from "./useTypedSelector";
+export {
+    useTypedSelector
+}

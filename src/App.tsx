@@ -1,57 +1,48 @@
 import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import {Container, Grid, Paper} from '@material-ui/core';
+import Navbar from './components/layout/Navbar';
+import {About} from './pages/About';
+import {Home} from './pages/Home';
+import {CreateProgram} from './pages/CreateProgram';
+import {MyProgram} from './pages/MyProgram';
+import {useTypedSelector} from "./app/hooks";
 
-function App() {
+const App: React.FC = () => {
+  const {isAuth} = useTypedSelector(state => state.user)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+      <BrowserRouter>
+        <Navbar/>
+        <Container maxWidth="xl">
+          <Grid container spacing={1} justifyContent="center">
+            <Grid item container direction="column" xs={12} sm={2}>
+              <Grid item>
+                <Paper style={{height: '49vh', background: 'orange'}}/>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} sm={8}>
+              <Paper style={{height: '100vh', background: 'lightgrey', overflow: 'hidden'}}>
+                <Switch>
+                  <Route path="/" component={Home} exact/>
+                  <Route path="/about" component={About}/>
+                  {isAuth && <>
+                    <Route path="/create-program" component={CreateProgram}/>
+                    <Route path="/my-program" component={MyProgram}/>
+                  </>}
+                </Switch>
+              </Paper>
+            </Grid>
+
+            <Grid item container direction="column" xs={12} sm={2}>
+              <Grid item>
+                <Paper style={{height: '49vh', background: 'green'}}/>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Container>
+      </BrowserRouter>
   );
 }
 
