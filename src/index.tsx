@@ -1,22 +1,20 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import CssBaseline from '@mui/material/CssBaseline';
-import App from './App';
-import {Provider} from "react-redux";
-import {store} from "./store";
-import {createTheme, ThemeProvider} from '@mui/material/styles';
-
-const theme = createTheme({
-    direction: 'rtl', // Both here and <body dir="rtl">
-});
-
+/*eslint-disable*/
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import ProviderDarkMode from './hooks/useDarkMode'
+import {store} from './store'
+import App from './App'
+import {CssBaseline} from "@material-ui/core";
 
 ReactDOM.render(
-    <Provider store={store}>
-        <ThemeProvider theme={theme}>
-            <CssBaseline/>
-            <App/>
-        </ThemeProvider>
-    </Provider>,
+    <React.Fragment>
+        <ProviderDarkMode>
+        <Provider store={store}>
+            <CssBaseline />
+                <App />
+        </Provider>
+        </ProviderDarkMode>
+    </React.Fragment>,
     document.getElementById('root'),
-);
+)

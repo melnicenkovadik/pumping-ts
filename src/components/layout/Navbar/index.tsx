@@ -12,9 +12,11 @@ import {
     Container,
     Avatar,
     Button,
-    Tooltip
+    Tooltip, FormControlLabel, Switch
 } from '@mui/material';
 import {useTypedSelector} from "../../../app/hooks";
+import {useDarkModeDispatcher} from "../../../hooks/useDarkMode";
+import {useTheme} from "@material-ui/core";
 
 const pages = [
     {
@@ -41,6 +43,8 @@ const pages = [
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const Navbar: React.FC = () => {
+    const theme = useTheme();
+    const themeDispatcher = useDarkModeDispatcher();
     const {isAuth, user} = useTypedSelector(state => state.user)
 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -61,6 +65,7 @@ const Navbar: React.FC = () => {
         setAnchorElUser(null);
     };
 
+    // @ts-ignore
     return (
         <>
             <AppBar position="static" sx={{mb: 2}}>
@@ -123,9 +128,17 @@ const Navbar: React.FC = () => {
                         >
                             LOGO
                         </Typography>
+                        <FormControlLabel
+                            control={<Switch onClick={() => {
+                                // @ts-ignore
+                                themeDispatcher.changeTheme()
+                            }} />}
+                            label={
+                                theme.palette.type}
+                        />
                         <Box sx={{flexGrow: 1, gap: 2, display: {xs: 'none', md: 'flex'}}}>
                             {pages.map(({page, path, isPrivate}) => (
-                                isAuth ? <NavLink
+                                user ? <NavLink
                                         to={path}
                                         key={page}
                                     >
@@ -155,7 +168,7 @@ const Navbar: React.FC = () => {
                         <Box sx={{flexGrow: 0}}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                    <Avatar alt="Remy Sharp" src={isAuth ? user.url : "/static/images/avatar/2.jpg"}/>
+                                    <Avatar alt="Remy Sharp" src={user ? user?.url : "/static/images/avatar/2.jpg"}/>
                                 </IconButton>
                             </Tooltip>
                             <Menu
